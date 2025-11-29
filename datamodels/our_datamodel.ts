@@ -1,6 +1,8 @@
 enum Material {
     Wood,
+    Concrete,
     Metal,
+    Stone,
 }
 
 enum BenchType {
