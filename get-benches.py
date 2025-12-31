@@ -18,7 +18,7 @@ def get_json(outfile: str):
 
 def get_csv(outfile:str):
     assert(outfile.endswith("csv"))
-    format = 'csv(::id,::lat,::lon,"amenity","backrest","crossing","highway","tactile_paving","colour","material","seats")'
+    format = 'csv(::id,::lat,::lon,"backrest","material","seats","amenity","covered")'
     data = api.get(query, verbosity="geom", responseformat=format)
     file = open(outfile, "w")
     csv_writer = csv.writer(file)
@@ -30,8 +30,8 @@ if __name__ == '__main__':
     basedir = "dumps"
     os.makedirs(basedir, exist_ok=True)
 
-    jsonfile = os.path.join(basedir, "benches.json")
-    get_json(jsonfile)
+    # jsonfile = os.path.join(basedir, "benches.json")
+    # get_json(jsonfile)
 
     csvfile = os.path.join(basedir, "benches.csv")
     get_csv(csvfile)

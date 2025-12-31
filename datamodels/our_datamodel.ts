@@ -12,12 +12,12 @@ enum BenchType {
 }
 
 type Bench = {
-    xcoord: number,
-    ycoord: number,
-    type?: BenchType,
-    material?: Material,
+    lat: number,
+    lon: number,
     backrest?: boolean,
+    material?: Material,
+    seats?: number,
+    type?: BenchType,
     covered?: boolean,
-    capacity?: number,
     pov?: ImageData,
 }
