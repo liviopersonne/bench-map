@@ -1,6 +1,5 @@
 import os
 from pykml import parser
-import numpy as np
 
 class Bench:
     def __init__(self, id: str, latitude: float, longitude: float, backrest: bool, material: str, seats: int, amenity: str, covered: bool, image: str):
