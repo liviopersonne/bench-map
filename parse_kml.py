@@ -34,14 +34,14 @@ def parse_kml(kml_filepath):
         folder_name = folder.name.text
         print("Folder", folder_name)
 
-        for placemark in folder.Placemark[:4]:
+        for placemark in folder.Placemark:
             yield parse_bench(placemark)
 
 def tagsearch(data, name):
     KML_NS = "{http://www.opengis.net/kml/2.2}"
     content = data.find(f"{KML_NS}Data[@name='{name}']")
     if content is not None:
-        return str(content.value).strip().lower()
+        return str(content.value).strip()
 
 def parse_bool(b):
     if b == "yes":
@@ -58,21 +58,42 @@ def parse_bench(placemark):
         longitude = float(tagsearch(data, "@lon"))
         backrest = parse_bool(tagsearch(data, "backrest"))
         material = tagsearch(data, "material")
-        seats = int(float(tagsearch(data, "seats")))
+        seats = tagsearch(data, "seats")
         amenity = tagsearch(data, "amenity")
+        leisure = tagsearch(data, "leisure")
         covered = parse_bool(tagsearch(data, "covered"))
         image = tagsearch(data, "gx_media_links")
 
-        if amenity == "bench":
-            return Bench(id,latitude,longitude,backrest,material,seats,amenity,covered,image)
+        if amenity and amenity.lower() == "bench":
+            return Bench(id,latitude,longitude,backrest,material,seats,"bench",covered,image)
+        if amenity and amenity.lower() == "sports bench":
+            return Bench(id,latitude,longitude,backrest,material,seats,"sports_bench",covered,image)
+        if leisure and leisure.lower() == "picnic_table":
+            return Bench(id,latitude,longitude,backrest,material,seats,"picnic_table",covered,image)
+        if amenity and amenity.lower() == "transat":
+            return Bench(id,latitude,longitude,backrest,material,seats,"transat",covered,image)
         else:
-            print("Invalid data:", id, "amenity: ", amenity)
+            return Bench(id,latitude,longitude,backrest,material,seats,None,covered,image)
     except ValueError as e:
         print("Invalid data:", id, e)
+
+def download_image(img, counter):
+    shortImg = img[57:75]
+    # print("Downloading", img)
+    os.rename(f"docs/images/download({counter}).png", f"docs/images/{shortImg}.png")
 
 
 if __name__ == '__main__':
     basedir = "dumps"
     kml_filepath = os.path.join(basedir, "full_map.kml")
-    parse_kml(kml_filepath)
+
+    imgCounter = 0
+
+    for b in parse_kml(kml_filepath):
+        if b is not None:
+            # print(b)
+            if b.image is not None:
+                print(b.image[54:64], imgCounter)
+                download_image(b.image, imgCounter)
+                imgCounter += 1
     
