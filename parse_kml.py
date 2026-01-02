@@ -41,7 +41,10 @@ def tagsearch(data, name):
     KML_NS = "{http://www.opengis.net/kml/2.2}"
     content = data.find(f"{KML_NS}Data[@name='{name}']")
     if content is not None:
-        return str(content.value).strip()
+        value = str(content.value).strip()
+        if name == "image":
+            content = replace_img_link(value)
+        return value
 
 def parse_bool(b):
     if b == "yes":
@@ -62,7 +65,7 @@ def parse_bench(placemark):
         amenity = tagsearch(data, "amenity")
         leisure = tagsearch(data, "leisure")
         covered = parse_bool(tagsearch(data, "covered"))
-        image = tagsearch(data, "gx_media_links")
+        image = tagsearch(data, "image")
 
         if amenity and amenity.lower() == "bench":
             return Bench(id,latitude,longitude,backrest,material,seats,"bench",covered,image)
@@ -82,6 +85,12 @@ def download_image(img, counter):
     # print("Downloading", img)
     os.rename(f"docs/images/download({counter}).png", f"docs/images/{shortImg}.png")
 
+def replace_img_link(image):
+    base_url = "https://liviopersonne.github.io/bench-map/images/"
+    if image is not None:
+        github_img = base_url + image[57:75] + ".png"
+        # print(image)
+        return f'<img src="{github_img}" width="400"/>'
 
 if __name__ == '__main__':
     basedir = "dumps"
@@ -94,6 +103,6 @@ if __name__ == '__main__':
             # print(b)
             if b.image is not None:
                 print(b.image[54:64], imgCounter)
-                download_image(b.image, imgCounter)
+                # download_image(b.image, imgCounter)
                 imgCounter += 1
     
